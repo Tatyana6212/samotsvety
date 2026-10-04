@@ -1,0 +1,11 @@
+const assert = require('node:assert/strict');
+const { LEVELS, evaluateLevel } = require('../campaign.js');
+assert.equal(LEVELS.length, 15);
+assert.ok(LEVELS.every((level, index) => level.target > 0 && level.moves > 0 && (!index || level.target > LEVELS[index - 1].target)));
+assert.equal(evaluateLevel(0, 299, 1), 'playing');
+assert.equal(evaluateLevel(0, 300, 0), 'level-up', 'reaching the goal on the final move wins the level');
+assert.equal(evaluateLevel(1, 100, 0), 'game-over');
+assert.equal(evaluateLevel(2, 850, 0), 'level-up');
+assert.equal(evaluateLevel(14, 4000, 0), 'complete');
+assert.equal(evaluateLevel(15, 0, 0), 'complete');
+console.log('Passed: fifteen-stage campaign, level-up, final-move success, failure and completion.');

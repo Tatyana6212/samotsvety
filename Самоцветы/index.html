@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#081522">
+  <title>Самоцветы — Три в ряд</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="audio.js" defer></script>
+  <script src="game.js" defer></script>
+  <script src="campaign.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="scene-backdrop" aria-hidden="true"></div>
+  <main class="game-shell">
+    <section id="start-screen" class="screen start-screen is-active" aria-labelledby="game-title">
+      <div class="start-card">
+        <p class="eyebrow">МАГИЯ ДРЕВНИХ КРИСТАЛЛОВ</p>
+        <h1 id="game-title">Самоцветы<span>Три в ряд</span></h1>
+        <div class="crystal-scene" aria-hidden="true">
+          <i class="scene-glow"></i><i class="scene-gem scene-gem-one"></i><i class="scene-gem scene-gem-two"></i><i class="scene-gem scene-gem-three"></i>
+          <i class="scene-star star-one">✦</i><i class="scene-star star-two">✧</i><i class="scene-star star-three">✦</i>
+        </div>
+        <p class="start-copy">Собирайте сияющие кристаллы, запускайте каскады и пройдите пятнадцать волшебных этапов.</p>
+        <div class="game-options">
+          <fieldset>
+            <legend>Режим</legend>
+            <label><input type="radio" name="mode" value="campaign" checked><span>Приключение<small>Цели и этапы</small></span></label>
+            <label><input type="radio" name="mode" value="timed"><span>60 секунд<small>Максимум очков</small></span></label>
+          </fieldset>
+          <fieldset>
+            <legend>Сложность</legend>
+            <label><input type="radio" name="difficulty" value="easy"><span>Легко<small>3 цвета</small></span></label>
+            <label><input type="radio" name="difficulty" value="normal" checked><span>Обычно<small>5 цветов</small></span></label>
+            <label><input type="radio" name="difficulty" value="hard"><span>Сложно<small>6 цветов</small></span></label>
+          </fieldset>
+        </div>
+        <div class="scene-picker" role="group" aria-label="Фон игры">
+          <span>Обстановка</span>
+          <button class="scene-choice" type="button" data-scene="garden" aria-pressed="true"><i aria-hidden="true">✿</i> Сад</button>
+          <button class="scene-choice" type="button" data-scene="grotto" aria-pressed="false"><i aria-hidden="true">✧</i> Грот</button>
+        </div>
+        <button id="play-button" class="primary-button" type="button">Играть</button>
+        <p class="start-best">Лучший результат <strong id="start-best">0</strong></p>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen game-screen" aria-label="Игра">
+      <header class="game-header">
+        <div>
+          <p class="eyebrow">ХРАНИЛИЩЕ САМОЦВЕТОВ</p>
+          <h2>Самоцветы</h2>
+        </div>
+        <div class="header-actions">
+          <button id="scene-toggle" class="scene-toggle" type="button" aria-label="Сменить фон на грот" title="Фон: сад"><span aria-hidden="true">✿</span><b>Сад</b></button>
+          <button id="pause-button" class="pause-button" type="button" aria-label="Пауза" title="Пауза"><span aria-hidden="true"></span></button>
+          <button id="audio-toggle" class="sound-toggle" type="button" aria-label="Отключить звук" aria-pressed="true" title="Звук включён"><span class="sound-icon" aria-hidden="true">♫</span></button>
+        </div>
+      </header>
+
+      <section class="level-panel" aria-label="Прогресс этапа">
+        <div class="level-copy"><span id="level-label">Этап 1</span><strong id="level-name">Лунный сад</strong></div>
+        <div class="moves"><span>Ходы</span><strong id="moves">16</strong></div>
+        <div class="progress-track" aria-hidden="true"><i id="progress-fill"></i></div>
+        <span id="goal-copy" class="goal-copy">Цель: 300</span>
+      </section>
+
+      <section class="mission-panel" aria-label="Задания уровня">
+        <div id="mission-list" class="mission-list"></div>
+        <div id="timer-box" class="timer-box" hidden><span>Время</span><strong id="timer">1:00</strong></div>
+      </section>
+
+      <section class="toolbar" aria-label="Управление игрой">
+        <div class="score"><span>Счёт</span><strong id="score">0</strong></div>
+        <div class="toolbar-actions">
+          <div class="best-mini"><span>Рекорд</span><strong id="best-score">0</strong></div>
+          <button id="new-game" class="new-game" type="button">Заново</button>
+        </div>
+      </section>
+      <div class="cheer-slot"><p id="cheer" class="cheer" aria-live="polite" aria-atomic="true"></p><span id="combo-badge" class="combo-badge" aria-hidden="true">×2</span></div>
+      <div class="board-wrap"><div id="board" class="board" aria-label="Игровое поле 8 на 8" aria-busy="false"><div id="gem-layer" class="gem-layer" aria-hidden="true"></div></div><div id="effects" class="effects" aria-hidden="true"></div></div>
+      <section class="boosters" aria-label="Бонусы">
+        <button class="booster" id="hammer" type="button"><span aria-hidden="true">🔨</span><strong>Молоток</strong><small id="hammer-count">1</small></button>
+        <button class="booster" id="shuffle" type="button"><span aria-hidden="true">⟳</span><strong>Перемешать</strong><small id="shuffle-count">1</small></button>
+        <button class="booster" id="free-swap" type="button"><span aria-hidden="true">↔</span><strong>Любой обмен</strong><small id="swap-count">1</small></button>
+      </section>
+      <p id="status" class="status" role="status" aria-live="polite">Выберите самоцвет и его соседа</p>
+      <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
+        <div class="pause-card">
+          <div class="pause-emblem" aria-hidden="true">✦</div>
+          <p class="eyebrow">НЕБОЛЬШАЯ ПЕРЕДЫШКА</p>
+          <h2 id="pause-title">Пауза</h2>
+          <p>Ваши самоцветы подождут. Продолжайте, когда будете готовы.</p>
+          <button id="resume-button" class="primary-button" type="button">Продолжить</button>
+          <button id="pause-new-game" class="pause-restart" type="button">Начать заново</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen result-screen" aria-labelledby="result-title">
+      <div class="result-card">
+        <div id="result-emblem" class="result-emblem" aria-hidden="true">✦</div>
+        <p id="result-kicker" class="eyebrow">ПУТЕШЕСТВИЕ ЗАВЕРШЕНО</p>
+        <h2 id="result-title">Великолепно!</h2>
+        <p id="result-message" class="result-message">Все этапы пройдены.</p>
+        <div class="result-score"><span>Ваш результат</span><strong id="final-score">0</strong></div>
+        <div class="result-best"><span>Лучший результат</span><strong id="final-best">0</strong></div>
+        <div class="result-actions">
+          <button id="next-level" class="primary-button" type="button">Следующий этап</button>
+          <button id="play-again" class="secondary-button" type="button">Играть снова</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
