@@ -222,7 +222,10 @@ function setupObstacles() {
     [{ i: 18, type: 'stone', solid: true, hp: 2 }, { i: 21, type: 'chain' }, { i: 27, type: 'ice' }, { i: 28, type: 'stone', solid: true, hp: 2 }, { i: 35, type: 'chain' }, { i: 36, type: 'ice' }, { i: 42, type: 'stone', solid: true, hp: 2 }, { i: 45, type: 'chain' }]
   ];
   const pattern = patterns[levelIndex % patterns.length];
-  const count = Math.max(2, Math.min(pattern.length, Math.round((2 + Math.floor(levelIndex / 3)) * difficulty.obstacles)));
+  const obstacleMission = missions.find(mission => mission.type === 'obstacle');
+  if (obstacleMission) obstacleMission.target = Math.min(obstacleMission.target, pattern.length);
+  const count = Math.min(pattern.length, Math.max(2, obstacleMission?.target || 0,
+    Math.round((2 + Math.floor(levelIndex / 3)) * difficulty.obstacles)));
   pattern.slice(0, count).forEach(item => obstacles.set(item.i, { type: item.type, solid: !!item.solid, hp: item.hp || 1 }));
 }
 function renderBoosters() {
@@ -392,7 +395,7 @@ function resetBoard() {
   ui.gemLayer.replaceChildren();
   setupObstacles(); const blocked = solidBlocks();
   board = rules.createBoard(difficulty.types, blocked); gemNodes = Array(64); specials = Array(64);
-  ui.status.textContent = 'Выберите самоцвет и его соседа'; render(); renderBoosters();
+  ui.status.textContent = 'Выберите самоцвет и его соседа'; renderLevel(); render(); renderBoosters();
 }
 function startCampaign() {
   paused = false; pendingOutcome = null; ui.pauseOverlay.hidden = true;

@@ -74,6 +74,27 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'), c
 elements.board.children.slice(1).forEach((cell, index) => { cell.index = index; });
 
 (async () => {
+  for (const name of ['easy', 'normal', 'hard']) {
+    for (let index = 0; index < campaign.LEVELS.length; index++) {
+      const result = vm.runInContext(`
+        difficulty = DIFFICULTIES['${name}']; gameMode = 'campaign'; levelIndex = ${index};
+        missions = buildMissions(); setupObstacles();
+        ({ count: obstacles.size, target: missions.find(mission => mission.type === 'obstacle')?.target });
+      `, context);
+      if (result.target !== undefined) {
+        assert.ok(result.count >= result.target, `level ${index + 1} (${name}) has enough obstacles for its goal`);
+      }
+      if (index === 1 && name === 'normal') {
+        assert.equal(result.target, 4, 'level 2 requires four obstacles');
+        assert.equal(result.count, 4, 'level 2 supplies four obstacles');
+      }
+    }
+  }
+  vm.runInContext("difficulty = DIFFICULTIES.hard; levelIndex = 13; missions = buildMissions(); resetBoard()", context);
+  assert.equal(vm.runInContext("missions.find(mission => mission.type === 'obstacle').target", context), 6,
+    'late obstacle goals stay within the available layout');
+  assert.ok(elements['mission-list'].children.some(item => item.innerHTML?.includes('Преграды 0/6')),
+    'the displayed goal reflects the actual obstacle layout');
   vm.runInContext('startCampaign()', context);
   assert.equal(elements.board.children.length, 65);
   vm.runInContext('select(0)', context);
